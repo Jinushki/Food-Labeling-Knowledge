@@ -1,0 +1,587 @@
+---
+author: "Jinushki Saluwadana - AS2018317"
+date: '2022-09-26'
+output: 
+  html_document :
+    theme: cerulean
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Name :** Jinushki Saluwadana
+
+**Index No :** AS2018317
+
+<center>
+
+# Consumers' Knowledge and Use of Food Labeling Information in Sri Lanka
+
+</center>
+
+<center>![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWgUvJygFQDgPKe9YyKxiN71EfiWXI8QkqjQ&usqp=CAU){width="239"}![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8zVi4yAPzlYdghqLr9qEiyxLSaQ5-IP7Txg&usqp=CAU){width="255"}![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQq9601QZN6JUDkIiagWuNa__XKR0XWXBRKgA&usqp=CAU)</center>
+
+The globally accepted definition of a food label, according to Agarwal, is any tag, mark, pictorial, or other descriptive text, written or printed, attached to a pre-packaged food container. They are the first informative tool found by the customers during shopping, and are informative in terms of ingredients, nutrient content, and the presence of allergens of the selected product. However, food labeling also represents a marketing tool and may influence perception of the food quality and, in turn, the dietary choice of consumers. For this reason, there is growing research in the food labeling field and in the evaluation of its effects on consumers, food operators, and the whole market.
+
+## Exploratory Analysis
+
+This study was conducted to evaluate the consumers' level of knowledge and use of information provided on food labels in making purchasing decisions. A structured questionnaire-based survey was used for the purpose of the study. This is a cross sectional study done over a period of five months from October, 2010 to March, 2011 with an average of seven interviews being conducted each week. The survey was conducted at supermarkets, retail shops of various sizes in five towns: Colombo 02, Kottawa, Maharagama, Nugegoda and Horana in Sri Lanka. A total of 586 respondents were considered for the study.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(skimr)
+library(tidyverse)
+library(janitor)
+library(ggplot2)
+library(gmodels)
+library(GGally)
+library(patchwork)
+library(MASS)
+library(huxtable)
+library(ggtext)
+library(viridis)
+
+foodlabel <- readr::read_csv("G:/University/4th Year/Stat/Data Visualization/Assignment 3/foodlabel-1.csv")
+
+#View(foodlabel)
+
+#summary(foodlabel)
+#glimpse(foodlabel)
+
+foodlabel$Gender[foodlabel$Gender == 0] <- "female"
+foodlabel$Gender[foodlabel$Gender == 1] <- "male"
+#prop.table(table(foodlabel$Gender))
+
+foodlabel$Education[foodlabel$Education == 1] <- 'Below O/L'
+foodlabel$Education[foodlabel$Education == 2] <- "Passed O/L"
+foodlabel$Education[foodlabel$Education == 3] <- "Passed A/L"
+foodlabel$Education[foodlabel$Education == 4] <- "Diploma"
+foodlabel$Education[foodlabel$Education == 5] <- "Degree"
+#prop.table(table(foodlabel$Education))
+
+foodlabel$Employment[foodlabel$Employment == 1] <- "Employed"
+foodlabel$Employment[foodlabel$Employment == 2] <- "Employed"
+foodlabel$Employment[foodlabel$Employment == 3] <- "Unemployed"
+foodlabel$Employment[foodlabel$Employment == 4] <- "Student"
+foodlabel$Employment[foodlabel$Employment == 5] <- "Housewife"
+foodlabel$Employment[foodlabel$Employment == 6] <- "Retired"
+#prop.table(table(foodlabel$Employment))
+
+foodlabel$marital[foodlabel$marital == 0] <- "Single"
+foodlabel$marital[foodlabel$marital == 1] <- "Married"
+#prop.table(table(foodlabel$marital))
+
+foodlabel$fshopper[foodlabel$fshopper == 0] <- "No"
+foodlabel$fshopper[foodlabel$fshopper == 1] <- "Yes"
+#prop.table(table(foodlabel$fshopper))
+
+foodlabel$mplanner[foodlabel$mplanner == 0] <- "No"
+foodlabel$mplanner[foodlabel$mplanner == 1] <- "Yes"
+#prop.table(table(foodlabel$mplanner))
+
+foodlabel$easy[foodlabel$easy == 1] <- "Very Important"
+foodlabel$easy[foodlabel$easy == 2] <- "Important"
+foodlabel$easy[foodlabel$easy == 3] <- "Moderately Important"
+foodlabel$easy[foodlabel$easy == 4] <- "Less Important"
+foodlabel$easy[foodlabel$easy == 5] <- "Unimportant"
+#prop.table(table(foodlabel$easy))
+
+foodlabel$familiarity[foodlabel$familiarity == 1] <- "Very Important"
+foodlabel$familiarity[foodlabel$familiarity == 2] <- "Important"
+foodlabel$familiarity[foodlabel$familiarity == 3] <- "Moderately Important"
+foodlabel$familiarity[foodlabel$familiarity == 4] <- "Less Important"
+foodlabel$familiarity[foodlabel$familiarity == 5] <- "Unimportant"
+#prop.table(table(foodlabel$familiarity))
+
+foodlabel$friends[foodlabel$friends == 1] <- "Very Important"
+foodlabel$friends[foodlabel$friends == 2] <- "Important"
+foodlabel$friends[foodlabel$friends == 3] <- "Moderately Important"
+foodlabel$friends[foodlabel$friends == 4] <- "Less Important"
+foodlabel$friends[foodlabel$friends == 5] <- "Unimportant"
+#prop.table(table(foodlabel$friends))
+
+foodlabel$Useful[foodlabel$Useful == 0] <- "Always"
+foodlabel$Useful[foodlabel$Useful == 1] <- "Mostly"
+foodlabel$Useful[foodlabel$Useful == 2] <- "Sometimes"
+foodlabel$Useful[foodlabel$Useful == 3] <- "Rarely"
+foodlabel$Useful[foodlabel$Useful == 4] <- "Never"
+foodlabel$Useful[foodlabel$Useful == 5] <- "Can't say"
+#prop.table(table(foodlabel$Useful))
+
+
+foodlabel$Easiness[foodlabel$Easiness == 0] <- "Always"
+foodlabel$Easiness[foodlabel$Easiness == 1] <- "Mostly"
+foodlabel$Easiness[foodlabel$Easiness == 2] <- "Sometimes"
+foodlabel$Easiness[foodlabel$Easiness == 3] <- "Rarely"
+foodlabel$Easiness[foodlabel$Easiness == 4] <- "Never"
+foodlabel$Easiness[foodlabel$Easiness == 5] <- "Can't say"
+#prop.table(table(foodlabel$Easiness))
+
+foodlabel$Sufficient[foodlabel$Sufficient == 0] <- "Always"
+foodlabel$Sufficient[foodlabel$Sufficient == 1] <- "Mostly"
+foodlabel$Sufficient[foodlabel$Sufficient == 2] <- "Sometimes"
+foodlabel$Sufficient[foodlabel$Sufficient == 3] <- "Rarely"
+foodlabel$Sufficient[foodlabel$Sufficient == 4] <- "Never"
+foodlabel$Sufficient[foodlabel$Sufficient == 5] <- "Can't say"
+#prop.table(table(foodlabel$Sufficient))
+
+foodlabel$Trusfulness[foodlabel$Trusfulness == 0] <- "Always"
+foodlabel$Trusfulness[foodlabel$Trusfulness == 1] <- "Mostly"
+foodlabel$Trusfulness[foodlabel$Trusfulness == 2] <- "Sometimes"
+foodlabel$Trusfulness[foodlabel$Trusfulness == 3] <- "Rarely"
+foodlabel$Trusfulness[foodlabel$Trusfulness == 4] <- "Never"
+foodlabel$Trusfulness[foodlabel$Trusfulness == 5] <- "Can't say"
+#prop.table(table(foodlabel$Trusfulness))
+
+foodlabel$Clear[foodlabel$Clear == 0] <- "Always"
+foodlabel$Clear[foodlabel$Clear == 1] <- "Mostly"
+foodlabel$Clear[foodlabel$Clear == 2] <- "Sometimes"
+foodlabel$Clear[foodlabel$Clear == 3] <- "Rarely"
+foodlabel$Clear[foodlabel$Clear == 4] <- "Never"
+foodlabel$Clear[foodlabel$Clear == 5] <- "Can't say"
+#prop.table(table(foodlabel$Clear))
+
+foodlabel$`e labels`[foodlabel$`e labels` == 0] <- "Yes"
+foodlabel$`e labels`[foodlabel$`e labels` == 1] <- "No"
+#prop.table(table(foodlabel$`e labels`))
+
+foodlabel$sodium[foodlabel$sodium == 1] <- "Low in Sodium"
+foodlabel$sodium[foodlabel$sodium == 2] <- "Very Low in Sodium"
+foodlabel$sodium[foodlabel$sodium == 3] <- "Sodium Free"
+foodlabel$sodium[foodlabel$sodium == 4] <- "Don't Know"
+#prop.table(table(foodlabel$sodium))
+
+foodlabel$netquan[foodlabel$netquan == 0] <- "Weight of the \namount of food only"
+foodlabel$netquan[foodlabel$netquan == 1] <- "Weight of the \npackaging and amount of food"
+foodlabel$netquan[foodlabel$netquan == 2] <- "Do not know"
+#prop.table(table(foodlabel$netquan))
+
+
+foodlabel$`low in fat`[foodlabel$`low in fat` == 0] <- "Not more than \n3 g per 100g"
+foodlabel$`low in fat`[foodlabel$`low in fat` == 1] <- "The food contains \nzero amount of fat"
+foodlabel$`low in fat`[foodlabel$`low in fat` == 2] <- "Not more than \n10 g per 100g"
+foodlabel$`low in fat`[foodlabel$`low in fat` == 3] <- "Don't know"
+#prop.table(table(foodlabel$`low in fat`))
+
+foodlabel$`low in cho`[foodlabel$`low in cho` == 0] <- "Not more than \n0.02 g per 100 g"
+foodlabel$`low in cho`[foodlabel$`low in cho` == 1] <- "Not more than \n10g per 100 g"
+foodlabel$`low in cho`[foodlabel$`low in cho` == 2] <- "The food contains \nzero amount of cholesterol"
+foodlabel$`low in cho`[foodlabel$`low in cho` == 3] <- "Don't know"
+#prop.table(table(foodlabel$`low in cho`))
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+skim(foodlabel)
+```
+
+### Composition of the Sample
+
+1.  **Major food shopper of the household**
+
+    *Table 01:*
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+tabyl(foodlabel, fshopper)
+```
+
+2.  **Major food shopper of the household**
+
+*Table 02:*
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+tabyl(foodlabel, mplanner)
+```
+
+3.  **Major food shoppers & meal planners**
+
+*Figure 01:*
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#sum(foodlabel$fshopper=='Yes' & foodlabel$mplanner=='Yes')
+#sum(foodlabel$fshopper=='Yes' & foodlabel$mplanner=='No')
+#sum(foodlabel$fshopper=='No' & foodlabel$mplanner=='Yes')
+#sum(foodlabel$fshopper=='No' & foodlabel$mplanner=='No')
+
+category <- c("Major food shopper & Major meal planner", "Major food shopper only","Major meal planner only", "None")
+cnt <- c(309,106,127,44)
+df1 <- data.frame(category, cnt)
+
+df1 <- df1  %>%
+  mutate(pct = cnt / sum(cnt),
+         pctlabel = paste0(round(pct*100), "%"))
+
+
+ggplot(df1, 
+       aes(x = reorder(category,cnt),
+           y = cnt)) + 
+  geom_bar(stat = "identity", 
+           fill = "indianred3", 
+           color = "black") +
+  geom_text(aes(label = pctlabel), 
+            vjust = -0.25) +
+  labs(x = "Category", 
+       y = "Count") + 
+  coord_flip()
+
+```
+
+4.  **Meal Planners and Food Shoppers by Gender**
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(ggmosaic)
+
+g2 <- ggplot(foodlabel)+
+geom_mosaic(aes(x=product(fshopper, Gender),
+fill=Gender))  +
+  labs(y = "Food Shopper") 
+
+g3 <- ggplot(foodlabel)+
+geom_mosaic(aes(x=product(mplanner, Gender),
+fill=Gender))  +
+  labs(y = "Meal Planner") 
+
+g2 + g3
+  
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+g4 <- ggplot(foodlabel)+
+geom_mosaic(aes(x=product(fshopper, Education),
+fill=Education))  +
+  labs(y = "Food Shopper") + theme(legend.position = "none") 
+
+g5 <- ggplot(foodlabel)+
+geom_mosaic(aes(x=product(mplanner, Education),
+fill=Education))  +
+  labs(y = "Meal Planner") + theme(legend.position = "none") 
+
+g4 + g5
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+g6 <- ggplot(foodlabel)+
+geom_mosaic(aes(x=product(fshopper, Employment),
+fill=Employment))  +
+  labs(y = "Food Shopper") + theme(legend.position = "none") 
+
+g7 <- ggplot(foodlabel)+
+geom_mosaic(aes(x=product(mplanner, Employment),
+fill=Employment))  +
+  labs(y = "Meal Planner") + theme(legend.position = "none")
+
+g6 + g7
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+g8 <- ggplot(foodlabel)+
+geom_mosaic(aes(x=product(fshopper, marital),
+fill=marital))  +
+  labs(y = "Food Shopper") + theme(legend.position = "none") 
+
+g9 <- ggplot(foodlabel)+
+geom_mosaic(aes(x=product(mplanner, marital),
+fill=marital))  +
+  labs(y = "Meal Planner") + theme(legend.position = "none")
+
+g8 + g9
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+library(plotly)
+library(reshape)
+
+food_shopper <- foodlabel %>% 
+  filter(fshopper %in% "Yes")
+#colnames(food_shopper)[which(names(food_shopper) == "Age")] <- "Food Shopper"
+
+food_shopper_1 <- data.frame(food_shopper$Age, rep(NA, 415))
+#View(food_shopper_1)
+
+food_shopper_11 <- data.frame(Food_shopper_age=unlist(food_shopper_1, use.names = FALSE))
+
+food_shopper_11 <- food_shopper_11[-c(437:nrow(food_shopper_11)), ]
+#View(food_shopper_11)
+
+
+meal_planner <- foodlabel %>% 
+  filter(mplanner %in% "Yes")
+#colnames(meal_planner)[which(names(meal_planner) == "Age")] <- "Meal Planner"
+
+age_data <- data.frame(food_shopper=food_shopper_11,meal_planner=meal_planner$Age)
+#View(age_data)
+age_data <- melt(age_data)
+#View(age_data)
+
+g1 <- ggplot(age_data, aes(x=value, fill=variable)) +
+  geom_density(alpha=0.6) + labs(x = "Age")
+ggplotly(g1)
+
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+library(viridis)
+df22 <- foodlabel %>% filter(fshopper %in% "Yes")  %>% group_by(easy) %>% count(easy)  
+colnames(df22) <- c("Levels", "Easy_Preparation")
+#View(df22)
+
+df33 <- foodlabel %>% filter(fshopper %in% "Yes")  %>% group_by(familiarity) %>% count(familiarity) 
+colnames(df33) <- c("Levels", "Familiarity")
+
+df44 <- foodlabel %>% filter(fshopper %in% "Yes")  %>% group_by(friends) %>% count(friends) 
+colnames(df44) <- c("Levels", "Recommendation")
+
+total12 <- merge(df22, df33, by="Levels")
+total12$Recommendation <- c(0,157,0,258,0)
+#View(total12)
+
+total112 <- total12 %>% pivot_longer(cols=c('Easy_Preparation', 'Familiarity', 'Recommendation'), names_to='Aspect',values_to='Count')
+#View(total112)
+
+g10 <- ggplot(total112, aes(x= factor(Levels, level=c("Unimportant" ,"Less Important","Moderately Important","Important","Very Important")), y= Aspect, fill=Count)) + 
+  geom_raster() + scale_fill_viridis(discrete = FALSE) +
+  ggtitle("Food Shoppers' \nperspective in buying \npackage food") +
+  xlab(label = "Level") +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.width="110%"}
+
+df222 <- foodlabel %>% filter(mplanner %in% "Yes")  %>% group_by(easy) %>% count(easy)  
+colnames(df222) <- c("Levels", "Easy_Preparation")
+#View(df222)
+
+df333 <- foodlabel %>% filter(mplanner %in% "Yes")  %>% group_by(familiarity) %>% count(familiarity) 
+colnames(df333) <- c("Levels", "Familiarity")
+
+df444 <- foodlabel %>% filter(mplanner %in% "Yes")  %>% group_by(friends) %>% count(friends) 
+colnames(df444) <- c("Levels", "Recommendation")
+#View(df444)
+
+total13 <- merge(df222, df333, by="Levels")
+total13$Recommendation <- c(0,174,0,262,0)
+#View(total13)
+
+total113 <- total13 %>% pivot_longer(cols=c('Easy_Preparation', 'Familiarity', 'Recommendation'), names_to='Aspect',values_to='Count')
+#View(total113)
+
+g11 <- ggplot(total113, aes(x= factor(Levels, level=c("Unimportant" ,"Less Important","Moderately Important","Important","Very Important")), y= Aspect, fill=Count)) + 
+  geom_raster() + scale_fill_viridis(discrete = FALSE) +
+  ggtitle("Meal Planners' \nperspective in buying \npackage food") +
+  xlab(label = "Level") +
+  theme(axis.text.x = element_text(angle = 90))
+
+g10 + g11
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+df2 <- foodlabel %>% filter(fshopper %in% "Yes")  %>% group_by(Useful) %>% count(Useful)  
+colnames(df2) <- c("Levels", "Useful")
+#View(df2)
+
+df3 <- foodlabel %>% filter(fshopper %in% "Yes")  %>% group_by(Easiness) %>% count(Easiness) 
+colnames(df3) <- c("Levels", "Easiness")
+
+df4 <- foodlabel %>% filter(fshopper %in% "Yes")  %>% group_by(Sufficient) %>% count(Sufficient) 
+colnames(df4) <- c("Levels", "Sufficient")
+
+df5 <- foodlabel %>% filter(fshopper %in% "Yes")  %>% group_by(Trusfulness) %>% count(Trusfulness) 
+colnames(df5) <- c("Levels", "Trustworthiness")
+
+df6 <- foodlabel %>% filter(fshopper %in% "Yes")  %>% group_by(Clear) %>% count(Clear)
+colnames(df6) <- c("Levels", "Clear")
+
+#df_list <- list(df2, df3, df4, df5, df6)      
+
+#df_list %>% reduce(full_join, by="Levels")
+#View(df_list)
+
+#df7 <- as.data.frame(do.call(cbind, df_list))
+#df7
+
+total1 <- merge(merge(merge(merge(df2, df3, by="Levels"),df4,by="Levels"),df5,by="Levels"),df6,by="Levels")
+#View(total1)
+
+total11 <- total1 %>% pivot_longer(cols=c('Useful', 'Easiness', 'Sufficient', 'Trustworthiness', 'Clear'), names_to='Factor', values_to='Count')
+#View(total11)
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+g12 <- ggplot(total11, aes(x= factor(Levels, level=c("Mostly" ,"Sometimes","Rarely","Never","Can't say")), y= Factor, fill=Count)) + 
+  geom_raster() + scale_fill_viridis(discrete = FALSE) +
+  ggtitle("Food Shoppers' Attitude \ntowards Food Labels") +
+  xlab(label = "Level") +
+  theme(axis.text.x = element_text(angle = 90))
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, out.width="110%"}
+
+dff2 <- foodlabel %>% filter(mplanner %in% "Yes")  %>% group_by(Useful) %>% count(Useful)  
+colnames(dff2) <- c("Levels", "Useful")
+#View(dff2)
+
+dff3 <- foodlabel %>% filter(mplanner %in% "Yes")  %>% group_by(Easiness) %>% count(Easiness) 
+colnames(dff3) <- c("Levels", "Easiness")
+
+dff4 <- foodlabel %>% filter(mplanner %in% "Yes")  %>% group_by(Sufficient) %>% count(Sufficient) 
+colnames(dff4) <- c("Levels", "Sufficient")
+
+dff5 <- foodlabel %>% filter(mplanner %in% "Yes")  %>% group_by(Trusfulness) %>% count(Trusfulness) 
+colnames(dff5) <- c("Levels", "Trustworthiness")
+
+dff6 <- foodlabel %>% filter(mplanner %in% "Yes")  %>% group_by(Clear) %>% count(Clear)
+colnames(dff6) <- c("Levels", "Clear")
+
+totall1 <- merge(merge(merge(merge(dff2, dff3, by="Levels"),dff4,by="Levels"),dff5,by="Levels"),dff6,by="Levels")
+#View(totall1)
+
+totall11 <- totall1 %>% pivot_longer(cols=c('Useful', 'Easiness', 'Sufficient', 'Trustworthiness', 'Clear'), names_to='Factor', values_to='Count')
+#View(totall11)
+
+g13 <- ggplot(totall11, aes(x= factor(Levels, level=c("Mostly" ,"Sometimes","Rarely","Never","Can't say")), y= Factor, fill=Count)) + 
+  geom_raster() + scale_fill_viridis(discrete = FALSE) +
+  ggtitle("Meal Planners' Attitude \ntowards Food Labels") +
+  xlab(label = "Level") +
+  theme(axis.text.x = element_text(angle = 90))
+
+g12 + g13
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+k1 <- foodlabel %>% filter(fshopper %in% "Yes")  %>% group_by(netquan) %>% count(netquan)  
+colnames(k1) <- c("Answer", "food shopper")
+#View(k1)
+
+k11 <- foodlabel %>% filter(mplanner %in% "Yes")  %>% group_by(netquan) %>% count(netquan)  
+colnames(k11) <- c("Answer", "meal planner")
+#View(k11)
+
+kk1 <- merge(k1, k11, by="Answer")
+#View(kk1)
+
+kk11 <- kk1 %>% pivot_longer(cols=c('food shopper', 'meal planner'), names_to='Type', values_to='Count')
+#View(kk11)
+
+ggplot(kk11, aes(y=Count, x=Answer, fill=Answer)) + 
+    geom_bar(position="dodge", stat="identity") +
+    facet_wrap(~Type) + 
+    theme(axis.text.x = element_text(angle = 60, hjust = 1)) + 
+    theme(axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank())  
+  
+
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+k2 <- foodlabel %>% filter(fshopper %in% "Yes")  %>% group_by(`low in fat`) %>% count(`low in fat`)  
+colnames(k2) <- c("Answer", "food shopper")
+#View(k2)
+
+k22 <- foodlabel %>% filter(mplanner %in% "Yes")  %>% group_by(`low in fat`) %>% count(`low in fat`)  
+colnames(k22) <- c("Answer", "meal planner")
+#View(k22)
+
+kk2 <- merge(k2, k22, by="Answer")
+#View(kk2)
+
+kk22 <- kk2 %>% pivot_longer(cols=c('food shopper', 'meal planner'), names_to='Type', values_to='Count')
+#View(kk22)
+
+ggplot(kk22, aes(y=Count, x=Answer, fill=Answer)) + 
+    geom_bar(position="dodge", stat="identity") +
+    facet_wrap(~Type) + 
+    theme(axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank()) 
+  
+
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+k3 <- foodlabel %>% filter(fshopper %in% "Yes")  %>% group_by(`low in cho`) %>% count(`low in cho`)  
+colnames(k3) <- c("Answer", "food shopper")
+#View(k3)
+
+k33 <- foodlabel %>% filter(mplanner %in% "Yes")  %>% group_by(`low in cho`) %>% count(`low in cho`)  
+colnames(k33) <- c("Answer", "meal planner")
+#View(k33)
+
+kk3 <- merge(k3, k33, by="Answer")
+#View(kk2)
+
+kk33 <- kk3 %>% pivot_longer(cols=c('food shopper', 'meal planner'), names_to='Type', values_to='Count')
+#View(kk33)
+
+ggplot(kk33, aes(y=Count, x=Answer, fill=Answer)) + 
+    geom_bar(position="dodge", stat="identity") +
+    facet_wrap(~Type) + 
+    theme(axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank())  
+  
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+k4 <- foodlabel %>% filter(fshopper %in% "Yes")  %>% group_by(sodium) %>% count(sodium)  
+colnames(k4) <- c("Answer", "food shopper")
+#View(k4)
+
+k44 <- foodlabel %>% filter(mplanner %in% "Yes")  %>% group_by(sodium) %>% count(sodium)  
+colnames(k44) <- c("Answer", "meal planner")
+#View(k44)
+
+kk4 <- merge(k4, k44, by="Answer")
+#View(kk4)
+
+kk44 <- kk4 %>% pivot_longer(cols=c('food shopper', 'meal planner'), names_to='Type', values_to='Count')
+#View(kk44)
+
+ggplot(kk44, aes(y=Count, x=Answer, fill=Answer)) + 
+    geom_bar(position="dodge", stat="identity") +
+    facet_wrap(~Type) + 
+    theme(axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank())  
+  
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+k5 <- foodlabel %>% filter(fshopper %in% "Yes")  %>% group_by(`e labels`) %>% count(`e labels`)  
+colnames(k5) <- c("Answer", "food shopper")
+#View(k5)
+
+k55 <- foodlabel %>% filter(mplanner %in% "Yes")  %>% group_by(`e labels`) %>% count(`e labels`)  
+colnames(k55) <- c("Answer", "meal planner")
+#View(k55)
+
+kk5 <- merge(k5, k55, by="Answer")
+#View(kk5)
+
+kk55 <- kk5 %>% pivot_longer(cols=c('food shopper', 'meal planner'), names_to='Type', values_to='Count')
+#View(kk55)
+
+ggplot(kk55, aes(y=Count, x=Answer, fill=Answer)) + 
+    geom_bar(stat="identity") +
+    facet_wrap(~Type)  
+  
+
+```
